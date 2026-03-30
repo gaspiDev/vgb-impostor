@@ -17,13 +17,13 @@ export default function GameScreen({ onEnd }) {
   return (
     <Card>
       <div className="flex flex-col gap-6 items-center">
-        <h2 className="text-2xl font-bold">Discussion Time</h2>
-        <p className="text-gray-500 text-lg">
-          Talk, question, and find the impostor!
+        <h2 className="text-2xl font-bold">Hora de Discutir</h2>
+        <p className="text-woods/70 text-lg">
+          Hablen, pregunten y encuentren al impostor!
         </p>
         <div className="text-5xl font-mono font-bold tabular-nums">{time}</div>
         <Button onClick={onEnd} variant="danger">
-          End Game
+          Terminar Partida
         </Button>
       </div>
     </Card>

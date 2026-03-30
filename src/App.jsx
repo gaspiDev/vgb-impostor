@@ -51,7 +51,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-moss flex flex-col items-center justify-center p-4 text-woods">
       {game.phase === "setup" && <SetupScreen onStartGame={onStartGame} />}
 
       {game.phase === "reveal" && (

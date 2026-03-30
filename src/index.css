@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+@theme {
+  --color-moss: #EDEDE0;
+  --color-woods: #2C3F35;
+  --color-sierra: #A67C5D;
+  --color-canopy: #4A7C59;
+  --color-canopy-hover: #3A6649;
+  --color-impostor: #E07A5F;
+  --color-mist: #7EB8A8;
+}

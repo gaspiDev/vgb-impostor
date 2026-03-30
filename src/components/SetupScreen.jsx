@@ -5,7 +5,7 @@ import Button from "./Button";
 export default function SetupScreen({ onStartGame }) {
   const [playerCount, setPlayerCount] = useState(3);
   const [players, setPlayers] = useState(
-    Array.from({ length: 3 }, (_, i) => `Player ${i + 1}`)
+    Array.from({ length: 3 }, (_, i) => `Jugador ${i + 1}`)
   );
 
   function updatePlayerCount(count) {
@@ -17,7 +17,7 @@ export default function SetupScreen({ onStartGame }) {
           ...prev,
           ...Array.from(
             { length: clamped - prev.length },
-            (_, i) => `Player ${prev.length + i + 1}`
+            (_, i) => `Jugador ${prev.length + i + 1}`
           ),
         ];
       }
@@ -34,12 +34,14 @@ export default function SetupScreen({ onStartGame }) {
   return (
     <Card>
       <div className="flex flex-col gap-6">
-        <h1 className="text-3xl font-bold">Impostor</h1>
-        <p className="text-gray-500">Set up your game</p>
+        <div className="bg-woods rounded-2xl py-3 px-4 -mx-1">
+          <h1 className="text-3xl font-bold text-moss">Impostor</h1>
+        </div>
+        <p className="text-woods/70">Configura tu partida</p>
 
         <div className="flex items-center justify-center gap-4">
           <button
-            className="w-12 h-12 rounded-full bg-gray-200 text-2xl font-bold"
+            className="w-12 h-12 rounded-full bg-woods/10 text-2xl font-bold text-woods cursor-pointer hover:bg-woods/20 transition-colors"
             onClick={() => updatePlayerCount(playerCount - 1)}
           >
             -
@@ -48,7 +50,7 @@ export default function SetupScreen({ onStartGame }) {
             {playerCount}
           </span>
           <button
-            className="w-12 h-12 rounded-full bg-gray-200 text-2xl font-bold"
+            className="w-12 h-12 rounded-full bg-woods/10 text-2xl font-bold text-woods cursor-pointer hover:bg-woods/20 transition-colors"
             onClick={() => updatePlayerCount(playerCount + 1)}
           >
             +
@@ -62,14 +64,14 @@ export default function SetupScreen({ onStartGame }) {
               type="text"
               value={name}
               onChange={(e) => updateName(i, e.target.value)}
-              placeholder={`Player ${i + 1}`}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-black"
+              placeholder={`Jugador ${i + 1}`}
+              className="w-full border border-woods/20 bg-moss rounded-xl px-4 py-3 text-lg text-woods placeholder-woods/40 focus:outline-none focus:border-canopy"
             />
           ))}
         </div>
 
         <Button onClick={() => onStartGame(players)} disabled={!canStart}>
-          Start Game
+          Iniciar Partida
         </Button>
       </div>
     </Card>

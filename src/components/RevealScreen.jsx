@@ -24,11 +24,11 @@ export default function RevealScreen({
     return (
       <Card>
         <div className="flex flex-col gap-6 items-center">
-          <p className="text-gray-500 text-lg">
-            Pass the phone to
+          <p className="text-woods/70 text-lg">
+            Pasa el telefono a
           </p>
           <h2 className="text-2xl font-bold">{players[currentTurn]}</h2>
-          <Button onClick={() => setRevealed(true)}>Tap to Reveal</Button>
+          <Button onClick={() => setRevealed(true)}>Revelar</Button>
         </div>
       </Card>
     );
@@ -39,16 +39,18 @@ export default function RevealScreen({
       <div className="flex flex-col gap-6 items-center">
         {isImpostor ? (
           <>
-            <p className="text-red-500 text-lg font-semibold">You are the</p>
-            <h2 className="text-3xl font-bold text-red-500">Impostor!</h2>
-            <div className="bg-red-50 rounded-xl p-4 w-full">
-              <p className="text-gray-500 text-sm">Hint</p>
+            <p className="text-impostor text-lg font-semibold">Eres el</p>
+            <h2 className="text-3xl font-bold text-impostor drop-shadow-[0_0_12px_rgba(224,122,95,0.5)]">
+              Impostor!
+            </h2>
+            <div className="bg-impostor/15 rounded-xl p-4 w-full">
+              <p className="text-woods/60 text-sm">Pista</p>
               <p className="text-lg font-medium">{hint}</p>
             </div>
           </>
         ) : (
           <>
-            <p className="text-gray-500 text-sm uppercase tracking-wide">
+            <p className="text-woods/60 text-sm uppercase tracking-wide">
               {category}
             </p>
             <h2 className="text-3xl font-bold">{word}</h2>
@@ -56,7 +58,7 @@ export default function RevealScreen({
         )}
 
         <Button onClick={handleNext}>
-          {isLastPlayer ? "Start Discussion" : "Next Player"}
+          {isLastPlayer ? "Comenzar Discusion" : "Siguiente Jugador"}
         </Button>
       </div>
     </Card>
