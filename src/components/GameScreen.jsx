@@ -17,15 +17,15 @@ export default function GameScreen({ onEnd }) {
   return (
     <Card>
       <div className="flex flex-col gap-6 items-center">
-        <h2 className="text-2xl font-bold">Hora de Discutir</h2>
-        <p className="text-woods/70 text-lg">
-          Hablen, pregunten y encuentren al impostor!
+        <h2 className="text-2xl font-bold text-moss-light">Hora de hablar</h2>
+        <p className="text-moss-light/70 text-lg">
+          Cada uno dice una palabra y al finalizar se vota para expulsar al impostor <br></br><b>o no...!</b>
         </p>
-        <div className="text-5xl font-mono font-bold tabular-nums">{time}</div>
+        <div className="text-5xl font-arcade text-canopy text-glow tabular-nums">{time}</div>
         <Button onClick={onEnd} variant="danger">
           Terminar Partida
         </Button>
       </div>
-    </Card>
+    </Card >
   );
 }

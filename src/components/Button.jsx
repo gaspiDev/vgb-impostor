@@ -1,8 +1,8 @@
 export default function Button({ children, onClick, disabled, variant = "primary" }) {
-  const base = "rounded-2xl py-4 px-8 text-xl w-full font-semibold transition-colors cursor-pointer";
+  const base = "rounded-2xl py-4 px-8 text-xl w-full font-bold uppercase tracking-wide transition-colors cursor-pointer";
   const variants = {
-    primary: "bg-canopy hover:bg-canopy-hover text-white",
-    secondary: "bg-sierra/30 text-woods hover:bg-sierra/40",
+    primary: "bg-canopy hover:bg-canopy-hover text-woods",
+    secondary: "bg-bark text-moss-light hover:bg-bark/80 border border-mist/30",
     danger: "bg-impostor text-white hover:bg-impostor/90",
   };
 

@@ -34,23 +34,20 @@ export default function SetupScreen({ onStartGame }) {
   return (
     <Card>
       <div className="flex flex-col gap-6">
-        <div className="bg-woods rounded-2xl py-3 px-4 -mx-1">
-          <h1 className="text-3xl font-bold text-moss">Impostor</h1>
-        </div>
-        <p className="text-woods/70">Configura tu partida</p>
+        <p className="text-moss-light/70">Configura tu partida</p>
 
         <div className="flex items-center justify-center gap-4">
           <button
-            className="w-12 h-12 rounded-full bg-woods/10 text-2xl font-bold text-woods cursor-pointer hover:bg-woods/20 transition-colors"
+            className="w-12 h-12 rounded-full bg-moss-light/10 text-2xl font-bold text-moss-light cursor-pointer hover:bg-moss-light/20 transition-colors"
             onClick={() => updatePlayerCount(playerCount - 1)}
           >
             -
           </button>
-          <span className="text-2xl font-semibold w-20 text-center">
+          <span className="text-2xl font-semibold w-20 text-center text-moss-light">
             {playerCount}
           </span>
           <button
-            className="w-12 h-12 rounded-full bg-woods/10 text-2xl font-bold text-woods cursor-pointer hover:bg-woods/20 transition-colors"
+            className="w-12 h-12 rounded-full bg-moss-light/10 text-2xl font-bold text-moss-light cursor-pointer hover:bg-moss-light/20 transition-colors"
             onClick={() => updatePlayerCount(playerCount + 1)}
           >
             +
@@ -65,7 +62,7 @@ export default function SetupScreen({ onStartGame }) {
               value={name}
               onChange={(e) => updateName(i, e.target.value)}
               placeholder={`Jugador ${i + 1}`}
-              className="w-full border border-woods/20 bg-moss rounded-xl px-4 py-3 text-lg text-woods placeholder-woods/40 focus:outline-none focus:border-canopy"
+              className="w-full border border-moss-light/20 bg-woods rounded-xl px-4 py-3 text-lg text-moss-light placeholder-moss-light/40 focus:outline-none focus:border-canopy"
             />
           ))}
         </div>

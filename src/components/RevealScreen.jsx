@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Card from "./Card";
 import Button from "./Button";
 
@@ -20,47 +21,65 @@ export default function RevealScreen({
     onNext();
   }
 
-  if (!revealed) {
-    return (
-      <Card>
-        <div className="flex flex-col gap-6 items-center">
-          <p className="text-woods/70 text-lg">
-            Pasa el telefono a
-          </p>
-          <h2 className="text-2xl font-bold">{players[currentTurn]}</h2>
-          <Button onClick={() => setRevealed(true)}>Revelar</Button>
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <Card>
-      <div className="flex flex-col gap-6 items-center">
-        {isImpostor ? (
-          <>
-            <p className="text-impostor text-lg font-semibold">Eres el</p>
-            <h2 className="text-3xl font-bold text-impostor drop-shadow-[0_0_12px_rgba(224,122,95,0.5)]">
-              Impostor!
-            </h2>
-            <div className="bg-impostor/15 rounded-xl p-4 w-full">
-              <p className="text-woods/60 text-sm">Pista</p>
-              <p className="text-lg font-medium">{hint}</p>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-woods/60 text-sm uppercase tracking-wide">
-              {category}
-            </p>
-            <h2 className="text-3xl font-bold">{word}</h2>
-          </>
-        )}
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentTurn}
+        initial={{ x: 80, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -80, opacity: 0 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        style={{ perspective: 1000, width: "100%", maxWidth: 384 }}
+      >
+        <motion.div
+          animate={{ rotateY: revealed ? 180 : 0 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          style={{ transformStyle: "preserve-3d", position: "relative", minHeight: 320 }}
+        >
+          {/* Back face — revealed content */}
+          <div style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)", position: "absolute", inset: 0 }}>
+            <Card>
+              <div className="flex flex-col gap-6 items-center justify-center h-full">
+                {isImpostor ? (
+                  <>
+                    <h2 className="text-3xl font-bold text-impostor text-glow-red">
+                      Impostor!
+                    </h2>
+                    <div className="bg-impostor/15 rounded-xl p-4 w-full">
+                      <p className="text-moss-light/60 text-sm">Pista</p>
+                      <p className="text-lg font-medium text-moss-light">{hint}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-moss-light/60 text-sm uppercase tracking-wide">
+                      {category}
+                    </p>
+                    <h2 className="text-3xl font-bold text-moss-light">{word}</h2>
+                  </>
+                )}
 
-        <Button onClick={handleNext}>
-          {isLastPlayer ? "Comenzar Discusion" : "Siguiente Jugador"}
-        </Button>
-      </div>
-    </Card>
+                <Button onClick={handleNext}>
+                  {isLastPlayer ? "Comenzar Discusion" : "Siguiente Jugador"}
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          {/* Front face — pass the phone (absolute, stretches to match back) */}
+          <div style={{ backfaceVisibility: "hidden", position: "absolute", inset: 0 }}>
+            <Card>
+              <div className="flex flex-col gap-6 items-center justify-center h-full">
+                <p className="text-moss-light/70 text-lg">
+                  Pasa el telefono a
+                </p>
+                <h2 className="text-2xl font-bold text-moss-light">{players[currentTurn]}</h2>
+                <Button onClick={() => setRevealed(true)}>Revelar</Button>
+              </div>
+            </Card>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
