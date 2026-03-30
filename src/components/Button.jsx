@@ -6,10 +6,16 @@ export default function Button({ children, onClick, disabled, variant = "primary
     danger: "bg-impostor text-white hover:bg-impostor/90",
   };
 
+  function handleClick(e) {
+    if (disabled) return;
+    new Audio("/sounds/minecraft-click.mp3").play();
+    onClick?.(e);
+  }
+
   return (
     <button
       className={`${base} ${variants[variant]} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
     >
       {children}

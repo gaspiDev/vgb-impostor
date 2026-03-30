@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { CATEGORIES } from "./data/words";
 import { pickRandomCategory, pickRandomWord, pickImpostorIndex } from "./utils/game";
 import HomeScreen from "./components/HomeScreen";
@@ -20,7 +20,34 @@ const INITIAL_STATE = {
 export default function App() {
   const [game, setGame] = useState(INITIAL_STATE);
 
+  const bgMusic = useRef(null);
+
+  function startMusic() {
+    if (bgMusic.current) return;
+    bgMusic.current = true;
+
+    const ctx = new AudioContext();
+    const gainNode = ctx.createGain();
+    gainNode.gain.value = 0.15;
+    gainNode.connect(ctx.destination);
+
+    fetch("/sounds/suspense-bg.mp3")
+      .then((res) => res.arrayBuffer())
+      .then((buf) => ctx.decodeAudioData(buf))
+      .then((audioBuffer) => {
+        function playLoop() {
+          const source = ctx.createBufferSource();
+          source.buffer = audioBuffer;
+          source.connect(gainNode);
+          source.start(0);
+          source.onended = playLoop;
+        }
+        playLoop();
+      });
+  }
+
   function onGoToSetup() {
+    startMusic();
     setGame((prev) => ({ ...prev, phase: "setup" }));
   }
 
@@ -100,7 +127,13 @@ export default function App() {
         />
       )}
 
-      {game.phase === "game" && <GameScreen onEnd={onEndGame} />}
+      {game.phase === "game" && (
+        <GameScreen
+          players={game.players}
+          impostorIndex={game.impostorIndex}
+          onEnd={onEndGame}
+        />
+      )}
 
       {game.phase === "end" && (
         <EndScreen
