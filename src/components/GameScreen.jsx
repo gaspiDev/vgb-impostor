@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Card from "./Card";
 import Button from "./Button";
@@ -14,16 +14,21 @@ function randomStartOrder(playerList) {
   return rotateFrom(playerList, start);
 }
 
-export default function GameScreen({ players, impostorIndex, onEnd }) {
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+export default function GameScreen({ players, impostorIndices, onEnd }) {
   const [activePlayers, setActivePlayers] = useState(() => {
     const list = players.map((name, i) => ({ name, originalIndex: i }));
     return randomStartOrder(list);
   });
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(TURN_SECONDS);
-  const [phase, setPhase] = useState("turns"); // "turns" | "vote" | "result"
+  const [phase, setPhase] = useState("turns");
   const [round, setRound] = useState(1);
   const [kickedPlayer, setKickedPlayer] = useState(null);
+  const tickingRef = useRef(null);
 
   const finishTurns = useCallback(() => {
     setPhase("vote");
@@ -38,33 +43,71 @@ export default function GameScreen({ players, impostorIndex, onEnd }) {
     }
   }, [currentPlayer, activePlayers.length, finishTurns]);
 
+  // Countdown timer
   useEffect(() => {
     if (phase !== "turns" || secondsLeft <= 0) return;
     const id = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearInterval(id);
   }, [secondsLeft, phase]);
 
+  // Auto-advance on time out
   useEffect(() => {
     if (phase === "turns" && secondsLeft <= 0) {
+      vibrate(300);
       advancePlayer();
     }
   }, [secondsLeft, phase, advancePlayer]);
 
+  // Ticking sound + vibration for last 10 seconds
+  useEffect(() => {
+    if (phase === "turns" && secondsLeft <= 10 && secondsLeft > 0) {
+      if (!tickingRef.current) {
+        const audio = new Audio("/sounds/minecraft-click.mp3");
+        audio.volume = 0.4;
+        tickingRef.current = setInterval(() => {
+          audio.currentTime = 0;
+          audio.play();
+          vibrate(50);
+        }, 1000);
+      }
+    } else {
+      if (tickingRef.current) {
+        clearInterval(tickingRef.current);
+        tickingRef.current = null;
+      }
+    }
+    return () => {
+      if (tickingRef.current) {
+        clearInterval(tickingRef.current);
+        tickingRef.current = null;
+      }
+    };
+  }, [secondsLeft, phase]);
+
   function handleVote(playerIndex) {
     const voted = activePlayers[playerIndex];
-    const wasImpostor = voted.originalIndex === impostorIndex;
+    const wasImpostor = impostorIndices.includes(voted.originalIndex);
     new Audio(wasImpostor ? "/sounds/yay.mp3" : "/sounds/oof.mp3").play();
+    vibrate(wasImpostor ? [100, 50, 100, 50, 200] : [500]);
     setKickedPlayer(voted);
     setPhase("result");
   }
 
-  function handleAfterKick() {
-    const wasImpostor = kickedPlayer.originalIndex === impostorIndex;
-    if (wasImpostor) {
-      onEnd();
+  function handleAfterKick(innocentsWin) {
+    const remaining = activePlayers.filter((p) => p !== kickedPlayer);
+    const remainingImpostors = remaining.filter((p) => impostorIndices.includes(p.originalIndex));
+
+    if (remainingImpostors.length === 0) {
+      onEnd(true);
       return;
     }
-    const remaining = activePlayers.filter((p) => p !== kickedPlayer);
+
+    const remainingInnocents = remaining.length - remainingImpostors.length;
+    if (remainingInnocents <= remainingImpostors.length) {
+      onEnd(false);
+      return;
+    }
+
     setActivePlayers(randomStartOrder(remaining));
     setCurrentPlayer(0);
     setSecondsLeft(TURN_SECONDS);
@@ -79,20 +122,32 @@ export default function GameScreen({ players, impostorIndex, onEnd }) {
   const isLow = secondsLeft <= 10;
 
   if (phase === "result") {
-    const wasImpostor = kickedPlayer.originalIndex === impostorIndex;
+    const wasImpostor = impostorIndices.includes(kickedPlayer.originalIndex);
     const remaining = activePlayers.filter((p) => p !== kickedPlayer);
-    const impostorWins = !wasImpostor && remaining.length <= 2;
+    const remainingImpostors = remaining.filter((p) => impostorIndices.includes(p.originalIndex));
+    const remainingInnocents = remaining.length - remainingImpostors.length;
+    const impostorWins = !wasImpostor && remainingInnocents <= remainingImpostors.length;
+    const allImpostorsOut = wasImpostor && remainingImpostors.length === 0;
+
     return (
       <Card>
         <div className="flex flex-col gap-6 items-center text-center">
           <h2 className="text-2xl font-bold text-moss-light">{kickedPlayer.name}</h2>
-          {wasImpostor ? (
+          {allImpostorsOut ? (
             <>
               <div className="bg-canopy/20 rounded-xl p-4 w-full">
                 <p className="text-canopy text-lg font-bold text-glow">Era el Impostor!</p>
               </div>
               <p className="text-moss-light/70">Los inocentes ganan!</p>
-              <Button onClick={handleAfterKick}>Ver Resultado</Button>
+              <Button onClick={() => handleAfterKick(true)}>Ver Resultado</Button>
+            </>
+          ) : wasImpostor ? (
+            <>
+              <div className="bg-canopy/20 rounded-xl p-4 w-full">
+                <p className="text-canopy text-lg font-bold text-glow">Era un Impostor!</p>
+              </div>
+              <p className="text-moss-light/70">Pero queda otro impostor...</p>
+              <Button onClick={handleAfterKick}>Continuar</Button>
             </>
           ) : impostorWins ? (
             <>
@@ -101,7 +156,7 @@ export default function GameScreen({ players, impostorIndex, onEnd }) {
               </div>
               <p className="text-moss-light/70">No quedan suficientes jugadores.</p>
               <p className="text-impostor font-bold text-lg">El impostor gana!</p>
-              <Button onClick={onEnd} variant="danger">Ver Resultado</Button>
+              <Button onClick={() => onEnd(false)} variant="danger">Ver Resultado</Button>
             </>
           ) : (
             <>
@@ -128,7 +183,7 @@ export default function GameScreen({ players, impostorIndex, onEnd }) {
               <button
                 key={player.originalIndex}
                 onClick={() => handleVote(i)}
-                className="w-full py-3 px-4 rounded-xl bg-woods text-moss-light text-lg font-semibold text-left hover:bg-woods/70 transition-colors cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-woods text-moss-light text-lg font-semibold text-center hover:bg-woods/70 transition-colors cursor-pointer"
               >
                 {player.name}
               </button>

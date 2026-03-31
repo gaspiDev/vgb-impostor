@@ -6,15 +6,19 @@ import Button from "./Button";
 export default function RevealScreen({
   players,
   currentTurn,
-  impostorIndex,
+  impostorIndices,
   word,
   hint,
   category,
+  showHints,
   onNext,
 }) {
   const [revealed, setRevealed] = useState(false);
-  const isImpostor = currentTurn === impostorIndex;
+  const isImpostor = impostorIndices.includes(currentTurn);
   const isLastPlayer = currentTurn === players.length - 1;
+  const partner = isImpostor && impostorIndices.length > 1
+    ? players[impostorIndices.find((i) => i !== currentTurn)]
+    : null;
 
   function handleNext() {
     setRevealed(false);
@@ -39,16 +43,26 @@ export default function RevealScreen({
           {/* Back face — revealed content */}
           <div style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)", position: "absolute", inset: 0 }}>
             <Card>
-              <div className="flex flex-col gap-6 items-center justify-center h-full">
+              <div className="flex flex-col gap-4 items-center justify-center h-full">
                 {isImpostor ? (
                   <>
                     <h2 className="text-3xl font-bold text-impostor text-glow-red">
                       Impostor!
                     </h2>
-                    <div className="bg-impostor/15 rounded-xl p-4 w-full">
-                      <p className="text-moss-light/60 text-sm">Pista</p>
-                      <p className="text-lg font-medium text-moss-light">{hint}</p>
-                    </div>
+                    <p className="text-moss-light/60 text-sm uppercase tracking-wide">
+                      {category}
+                    </p>
+                    {showHints && (
+                      <div className="bg-impostor/15 rounded-xl p-3 w-full">
+                        <p className="text-moss-light/60 text-xs">Pista</p>
+                        <p className="text-base font-medium text-moss-light">{hint}</p>
+                      </div>
+                    )}
+                    {partner && (
+                      <p className="text-sm text-moss-light/60">
+                        Tu compañero: <span className="font-bold text-impostor">{partner}</span>
+                      </p>
+                    )}
                   </>
                 ) : (
                   <>
@@ -66,7 +80,7 @@ export default function RevealScreen({
             </Card>
           </div>
 
-          {/* Front face — pass the phone (absolute, stretches to match back) */}
+          {/* Front face — pass the phone */}
           <div style={{ backfaceVisibility: "hidden", position: "absolute", inset: 0 }}>
             <Card>
               <div className="flex flex-col gap-6 items-center justify-center h-full">
